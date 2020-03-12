@@ -1,36 +1,64 @@
 //model
-let model = {
-    location: null,
-    temperature: null,
-    celsius: true,
-    
-    setLocation: function(location){
-      this.location = location;
+const model = {
+    _location: "",
+    _temperature: "",
+    _celsius: "",
+    _icon: "",
+    _description: "",
+    _wind: "",
+    _humidity: "",
+
+    get location(){
+      return this._location;
     },
-    
-    setTemperature: function(temperature){
-      this.temperature = temperature;
+    set location(location){
+      this._location = location;
     },
-    
-    getLocation: function(){
-      return this.location;
+    get temperature(){
+      return this._temperature;
     },
-    
-  
-    getTemperature: function(){
-      return this.temperature;
+    set temperature(temperature){
+        this._temperature = temperature;
     },
-    
+    get celsius(){
+        return this._celsius;
+    },
+    set celsius(celsius){
+        this._celsius = celsius;
+    },
+    get icon(){
+        return this._icon;
+    },
+    set icon(icon){
+        this._icon = icon;
+    },
+    get description(){
+        return this._description;
+    },
+    set description(description){
+        this._description = description;
+    },
+    get wind(){
+        return this._wind;
+    },
+    set wind(wind){
+        this._wind = wind;
+    },
+    get humidity(){
+        return this._humidity;
+    },
+    set humidity(humidity){
+        this._humidity = humidity;
+    },
+     
     setCelsiusTrue: function(){
-      this.celsius = true;
+        this.celsius = true;
     },
-    
+      
     setCelsiusFalse: function(){
-      this.celsius = false;
-    },
-    getCelsius: function(){
-       return this.celsius;
+        this.celsius = false;
     }
+     
     
   }
   
@@ -85,29 +113,50 @@ let model = {
       this.findMe();
     },
     findMe: function() {
+        
+        function convertResponseToJSON(response){
+            console.log(response);
+            
+            return response.json()
+        }
+
+        function setWeatherData(data){ 
+            
+            model.location = data.name;
+            model.temperature = Math.round(data.main.temp);
+            model.icon = data.weather[0].icon;
+            model.description = data.weather[0].description;
+            model.wind = data.wind.speed;
+            model.humidity = data.main.humidity;
+        }
+
+        function setWeatherDataIntoView(){
+            
+            weatherView.setLocationContent(model.location);
+            weatherView.setTemperatureContent(model.temperature + ' ºC');
+            weatherView.setIcon(model.icon);
+            weatherView.setDesc(model.description);
+            weatherView.setWind(model.wind);
+            weatherView.setHumidity(model.humidity);
+            
+        }
+
+        function hideLoader(){
+            weatherView.removeLoader();
+        }
+
         function success(position) {
+          
+          
             const latitude  = position.coords.latitude;
             const longitude = position.coords.longitude;
            
           
           fetch('https://fcc-weather-api.glitch.me/api/current?lat='+latitude+'&lon='+longitude)
-          .then(response => response.json())
-          .then((data) => {
-            console.log(data);
-            
-            model.setLocation(data.name);
-            model.setTemperature(Math.round(data.main.temp));
-            
-            weatherView.setLocationContent(model.getLocation());
-            weatherView.setTemperatureContent(model.getTemperature() + ' ºC');
-            weatherView.setIcon(data.weather[0].icon);
-            weatherView.setDesc(data.weather[0].description);
-            weatherView.setWind(data.wind.speed);
-            weatherView.setHumidity(data.main.humidity);
-            
-            weatherView.removeLoader();
-            
-          });
+          .then(convertResponseToJSON)
+          .then(setWeatherData)     
+          .then(setWeatherDataIntoView)    
+          .then(hideLoader)  
   
         }
       
