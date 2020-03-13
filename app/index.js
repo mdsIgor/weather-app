@@ -58,20 +58,18 @@ const model = {
     setCelsiusFalse: function(){
         this.celsius = false;
     }
-     
-    
   }
   
   //view
-  let weatherView = {
+  const weatherView = {
      init: function(){  
        this.box = document.getElementById('weather-box');
+       this.desc = document.getElementById('desc');
+       this.humidity = document.getElementById('humidity');
+       this.icon = document.getElementById('weather-icon');
        this.loader = document.getElementById('loader');
        this.location = document.getElementById('location');
        this.temperature = document.getElementById('temp');
-       this.icon = document.getElementById('weather-icon');
-       this.desc = document.getElementById('desc');
-       this.humidity = document.getElementById('humidity');
        this.wind = document.getElementById('wind');
       
        controller.init();
@@ -128,6 +126,8 @@ const model = {
             model.description = data.weather[0].description;
             model.wind = data.wind.speed;
             model.humidity = data.main.humidity;
+            //initial temp unity
+            model.celsius = true; 
         }
 
         function setWeatherDataIntoView(){
@@ -175,11 +175,11 @@ const model = {
     
     toggleTempUnit: function(){
       
-      if(model.getCelsius()){
+      if(model.celsius){        
         model.setCelsiusFalse();
-        weatherView.setTemperatureContent(Math.round(this.convertFromCelsius(model.getTemperature())) +' ºF');
+        weatherView.setTemperatureContent(Math.round(this.convertFromCelsius(model.temperature)) +' ºF');
       } else {
-        weatherView.setTemperatureContent(Math.round(model.getTemperature()) + ' ºC');
+        weatherView.setTemperatureContent(Math.round(model.temperature) + ' ºC');
         model.setCelsiusTrue();
       }
       
