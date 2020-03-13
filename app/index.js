@@ -1,5 +1,11 @@
 //MODEL
-const model = {  
+const model = {
+
+  isCelsius: true,
+  toggleCelsius(){
+    this.isCelsius = !this.isCelsius;
+  },
+  
   get location(){
     return this._location;
   },
@@ -41,22 +47,75 @@ const model = {
   },
   set humidity(humidity){
     this._humidity = humidity;
-  },
-    
-  setCelsiusTrue(){
-    this.celsius = true;
-  },
-      
-  setCelsiusFalse(){
-    this.celsius = false;
   }
 }
   
 //VIEW
 const weatherView = {
-    
+
+  get box(){
+    return this._box;
+  },
+
+  set box(box){
+    this._box = box;
+  },
+  get desc(){
+    return this._desc;
+  },
+
+  set desc(desc){
+    this._desc = desc;
+  },
+  get humidity(){
+    return this._humidity;
+  },
+
+  set humidity(humidity){
+    this._humidity = humidity;
+  },
+  get icon(){
+    return this._icon;
+  },
+
+  set icon(icon){
+    this._icon = icon;
+  },
+  
+  get loader(){
+    return this._loader;
+  },
+
+  set loader(loader){
+    this._loader = loader;
+  },
+  
+  get location(){
+    return this._location;
+  },
+
+  set location(location){
+    this._location = location;
+  },
+  get temperature(){
+    return this._temperature;
+  },
+
+  set temperature(temperature){
+    this._temperature = temperature;
+  },
+  
+  get wind(){
+    return this._wind;
+  },
+
+  set wind(wind){
+    this._wind = wind;
+  },
+
   init(){  
-    this.box = document.getElementById('weather-box');
+
+    this.box = document.getElementById('weather-box');  
     this.desc = document.getElementById('desc');
     this.humidity = document.getElementById('humidity');
     this.icon = document.getElementById('weather-icon');
@@ -70,24 +129,24 @@ const weatherView = {
     this.temperature.addEventListener('click', e => controller.toggleTempUnit());
       
     },
-    
+
   setLocationContent(location){
     this.location.textContent = location;
   },
   setTemperatureContent(temperature){  
     this.temperature.textContent = temperature;
   },
-  setIcon(url) {
+  setIconSRC(url) {
     this.icon.src = url;
   },
-  setDesc(desc){
+  setDescContent(desc){
     this.desc.textContent = desc;
   },
-  setHumidity(humidity){
-    this.humidity.textContent = 'Humidity: ' + humidity + '%';
+  setHumidityContentContent(humidity){
+    this.humidity.textContent = `Humidity: ${humidity} %`;
   },
-  setWind(wind){
-    this.wind.textContent = 'Wind: ' + wind + ' Km/h';
+  setWindContent(wind){
+    this.wind.textContent = `Wind: ${wind} Km/h`;
   },
   removeLoader(){
     this.loader.classList.remove('loader');
@@ -113,26 +172,23 @@ const controller = {
       model.description = data.weather[0].description;
       model.wind = data.wind.speed;
       model.humidity = data.main.humidity;
-      //initial temp unity
-      model.celsius = true; 
     }
 
     const setWeatherDataIntoView = () =>{
       weatherView.setLocationContent(model.location);
-      weatherView.setTemperatureContent(model.temperature + ' ºC');
-      weatherView.setIcon(model.icon);
-      weatherView.setDesc(model.description);
-      weatherView.setWind(model.wind);
-      weatherView.setHumidity(model.humidity);
+      weatherView.setTemperatureContent(`${model.temperature} ºC`);
+      weatherView.setIconSRC(model.icon);
+      weatherView.setDescContent(model.description);
+      weatherView.setWindContent(model.wind);
+      weatherView.setHumidityContentContent(model.humidity);
     }
 
     const hideLoader = () => weatherView.removeLoader();
 
-    const success = position => {
-      const latitude  = position.coords.latitude;
-      const longitude = position.coords.longitude;
+    const success = ({coords}) => {
+      const {latitude, longitude} = coords;
                 
-      fetch('https://fcc-weather-api.glitch.me/api/current?lat='+latitude+'&lon='+longitude)
+      fetch(`https://fcc-weather-api.glitch.me/api/current?lat=${latitude}&lon=${longitude}`)
       .then(convertResponseToJSON)
       .then(setWeatherData)     
       .then(setWeatherDataIntoView)    
@@ -148,18 +204,20 @@ const controller = {
       navigator.geolocation.getCurrentPosition(success, error);
     }
   },
+
+  //mexer nessa funcao
   
   toggleTempUnit(){
-    if(model.celsius){        
-      model.setCelsiusFalse();
-      weatherView.setTemperatureContent(Math.round(this.convertFromCelsius(model.temperature)) +' ºF');
-    } else {
-      weatherView.setTemperatureContent(Math.round(model.temperature) + ' ºC');
-      model.setCelsiusTrue();
-    }
+
+    const unitStr = model.isCelsius? 'ºF' : "ºC"
+    const toggledTemp = model.isCelsius? this.convertCelsiusToFahrenheit(model.temperature) : model.temperature
+    const roundedTempValue = Math.round(toggledTemp);
+
+    weatherView.setTemperatureContent(`${roundedTempValue} ${unitStr}`);
+    model.toggleCelsius();
   },
 
-  convertFromCelsius(temperature){
+  convertCelsiusToFahrenheit(temperature){
     return (temperature*9/5)+32;
   }  
 }
