@@ -1,13 +1,5 @@
 //MODEL
-const model = {
-  _location: "",
-  _temperature: "",
-  _celsius: "",
-  _icon: "",
-  _description: "",
-  _wind: "",
-  _humidity: "",
-
+const model = {  
   get location(){
     return this._location;
   },
@@ -75,11 +67,10 @@ const weatherView = {
     
     controller.init();
       
-    this.temperature.addEventListener('click', function(e){
-      controller.toggleTempUnit();
-    });
+    this.temperature.addEventListener('click', e => controller.toggleTempUnit());
       
     },
+    
   setLocationContent(location){
     this.location.textContent = location;
   },
@@ -113,12 +104,9 @@ const controller = {
   },
 
   findMe(){
-    function convertResponseToJSON(response){
-      console.log(response);    
-      return response.json()
-    }
+    const convertResponseToJSON = response => response.json();
 
-    function setWeatherData(data){   
+    const setWeatherData = data =>{   
       model.location = data.name;
       model.temperature = Math.round(data.main.temp);
       model.icon = data.weather[0].icon;
@@ -129,7 +117,7 @@ const controller = {
       model.celsius = true; 
     }
 
-    function setWeatherDataIntoView(){
+    const setWeatherDataIntoView = () =>{
       weatherView.setLocationContent(model.location);
       weatherView.setTemperatureContent(model.temperature + ' ºC');
       weatherView.setIcon(model.icon);
@@ -138,11 +126,9 @@ const controller = {
       weatherView.setHumidity(model.humidity);
     }
 
-    function hideLoader(){
-      weatherView.removeLoader();
-    }
+    const hideLoader = () => weatherView.removeLoader();
 
-    function success(position){
+    const success = position => {
       const latitude  = position.coords.latitude;
       const longitude = position.coords.longitude;
                 
@@ -153,9 +139,8 @@ const controller = {
       .then(hideLoader)  
     }
 
-    function error(){
-      alert('Unable to retrieve your location');
-    }
+    const error = () => alert('Unable to retrieve your location');
+    
 
     if (!navigator.geolocation) {
       weatherView.location.textContent = 'Geolocation is not supported by your browser';
